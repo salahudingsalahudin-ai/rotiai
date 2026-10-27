@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RotiAI — Pakistani Recipes &amp; Real Calorie Facts</title>
+<meta name="description" content="Desi food, counted honestly. Real calories per serving and tested Pakistani recipes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+:root{
+  --bg:#070605; --ink:#f3ead8; --mute:#8d8372; --gold:#e8a33a; --gold2:#f6d58e; --line:rgba(243,234,216,.14);
+  --serif:'Cormorant Garamond',Georgia,serif; --display:'Abril Fatface',serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);overflow-x:hidden;cursor:none}
+a,button,input{color:inherit;text-decoration:none;cursor:none;font-family:inherit}
+em{font-style:italic;color:var(--gold)}
+.mono{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#cursor{position:fixed;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--gold);z-index:100;pointer-events:none;opacity:.92;transition:width .25s,height .25s,margin .25s}
+#cursor.big{width:54px;height:54px;margin:-27px 0 0 -27px;opacity:.55}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:22px 4vw}
+.logo{font-family:var(--display);font-size:20px;display:flex;gap:10px;align-items:center}
+.logo b{color:var(--gold);font-size:14px}
+.logo small{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;margin-left:6px;padding-left:12px;border-left:1px solid var(--line)}
+nav ul{display:flex;gap:2.2vw;list-style:none;align-items:center}
+nav li a{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);transition:color .3s}
+nav li a:hover{color:var(--gold)}
+nav li a.btn{color:var(--gold);border:1px solid var(--gold);padding:9px 16px;border-radius:999px;transition:background .3s,color .3s}
+nav li a.btn:hover{background:var(--gold);color:#120a02}
+
+/* stage */
+#stage{position:relative;height:100vh;overflow:hidden;background:radial-gradient(ellipse at 55% 45%,#1b1208 0%,#070605 65%)}
+.eyebrow{position:absolute;left:4vw;top:12vh;z-index:6;color:var(--gold)}
+.info-wrap{position:absolute;left:4vw;top:22vh;width:min(340px,30vw);z-index:5}
+.info{position:absolute;top:0;left:0;width:100%;opacity:0;visibility:hidden}
+.num{font-family:var(--serif);font-style:italic;font-size:clamp(48px,6vw,92px);color:var(--gold);line-height:1;display:flex;align-items:baseline;gap:10px}
+.num small{font-family:var(--mono);font-style:normal;font-size:10px;color:var(--mute);letter-spacing:.15em}
+.tag{margin:22px 0 10px}
+.info h2{font-weight:500;font-size:clamp(26px,3.2vw,48px);line-height:1}
+.info h2 em{display:block}
+.info p{margin-top:16px;font-size:15px;line-height:1.5;color:#b9ad98;max-width:30ch}
+.price{margin-top:22px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.price b{font-family:var(--display);font-weight:400;color:var(--gold2);font-size:clamp(38px,4vw,60px);line-height:1}
+.price i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink)}
+.price small{flex-basis:100%;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+.price a{margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:3px}
+.art{position:absolute;left:50%;top:46%;width:min(520px,52vh);height:min(520px,52vh);transform:translate(-50%,-52%);z-index:3}
+.dish{position:absolute;inset:0}
+.bowl{position:absolute;left:8%;right:8%;bottom:12%;height:22%;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 30%,#8c4a1e 0%,#4a2209 55%,#150a04 100%);box-shadow:0 40px 80px rgba(232,163,58,.12)}
+.mound{position:absolute;left:24%;right:24%;top:20%;bottom:24%;border-radius:48% 52% 46% 54%/55% 50% 50% 45%}
+.p{position:absolute}
+.p i{display:block;width:100%;height:100%;border-radius:999px;animation:bob var(--d,5s) ease-in-out infinite alternate;animation-delay:var(--dl,0s)}
+@keyframes bob{from{transform:translate3d(0,-7px,0) rotate(-6deg)}to{transform:translate3d(4px,9px,0) rotate(8deg)}}
+.words{position:absolute;left:0;right:0;bottom:6vh;height:clamp(110px,19vw,300px);overflow:hidden;z-index:4;pointer-events:none}
+.word{position:absolute;left:0;right:0;text-align:center;font-family:var(--display);font-size:clamp(80px,15vw,250px);line-height:1.05;white-space:nowrap;
+  background:linear-gradient(180deg,#fff4d6 0%,#f0c36a 55%,#b9772a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+.list{position:absolute;right:3.5vw;top:20vh;width:200px;z-index:5;display:flex;flex-direction:column;gap:2px}
+.list .mono{margin-bottom:12px}
+.list a{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line);color:var(--mute);transition:color .3s,padding .3s}
+.list a.on{color:var(--gold2);padding-left:8px}
+.list a span{font-family:var(--mono);font-size:9px;opacity:.7}
+.hint{position:absolute;left:4vw;bottom:5vh;z-index:6;display:flex;align-items:center;gap:14px}
+.hint::after{content:"";width:60px;height:1px;background:var(--gold)}
+.prog{position:absolute;right:4vw;bottom:5vh;z-index:6}
+
+/* sections */
+section.s{position:relative;padding:18vh 4vw;overflow:hidden}
+.big{font-weight:500;font-size:clamp(44px,7.4vw,124px);line-height:.95;letter-spacing:-.02em}
+.row{display:flex;gap:5vw;align-items:center;justify-content:space-between}
+.col-text{flex:0 0 38%}
+.col-text p{margin-top:28px;font-size:15px;color:#b9ad98;max-width:34ch;line-height:1.55}
+.eb{margin-bottom:24px}
+
+/* lookup */
+#lookup .big{max-width:14ch}
+.search{margin-top:7vh;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--gold);padding-bottom:14px;max-width:900px}
+.search input{flex:1;background:none;border:0;outline:0;font-size:clamp(26px,3.4vw,52px);color:var(--ink);font-style:italic}
+.search input::placeholder{color:rgba(243,234,216,.28)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;align-items:center}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);padding:9px 14px;border-radius:999px;color:var(--mute);transition:all .3s;background:none}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+#results{margin-top:5vh;max-width:900px}
+.res{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);font-size:clamp(20px,2vw,28px);transition:padding .35s,color .35s}
+.res:hover{padding-left:16px;color:var(--gold2)}
+.res span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--gold);text-align:right}
+.none{padding:20px 0;color:var(--mute);font-style:italic}
+
+/* hubs */
+.hubs{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:1.6vw}
+.card{position:relative;aspect-ratio:5/4;border-radius:6px;overflow:hidden;border:1px solid var(--line);display:block;background-size:cover;background-position:center}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,6,5,.15) 10%,rgba(7,6,5,.88));transition:background .4s}
+.card:hover::before{background:linear-gradient(180deg,rgba(7,6,5,0) 0%,rgba(7,6,5,.8))}
+.card .in{position:absolute;left:18px;right:18px;bottom:16px;z-index:2}
+.card .cn{font-family:var(--display);font-size:clamp(40px,4.6vw,76px);color:var(--gold2);line-height:1}
+.card h3{font-weight:500;font-size:clamp(20px,2vw,30px);margin-top:4px}
+.card p{font-size:13px;color:#cfc4ae;margin-top:4px}
+.card:nth-child(even){margin-top:6vh}
+
+/* guides list */
+#guides .row{align-items:flex-start}
+.glist{flex:0 0 46%;display:flex;flex-direction:column}
+.g{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-size:clamp(19px,1.9vw,27px);transition:padding .35s,color .35s;color:#cfc4ae}
+a.g:hover{padding-left:16px;color:var(--gold2)}
+.g .dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 18px currentColor;flex:none}
+.g .mono{margin-left:auto;white-space:nowrap}
+
+/* recipes */
+#menu .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:7vh;gap:4vw}
+#menu .head p{max-width:30ch;font-size:13px;color:var(--mute);line-height:1.5}
+.item{display:grid;grid-template-columns:50px 1.5fr 1.5fr 110px 110px;align-items:center;gap:20px;padding:20px 0;border-top:1px solid var(--line);position:relative}
+.item:last-child{border-bottom:1px solid var(--line)}
+.item h3{font-weight:500;font-size:clamp(24px,3.2vw,50px);line-height:1;transition:transform .4s,color .3s}
+.item p{font-size:13px;color:var(--mute);line-height:1.4}
+.item .pr{font-size:clamp(18px,1.6vw,24px);text-align:right;color:var(--gold2)}
+.item .pr small{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mute)}
+.item:hover h3{color:var(--gold);font-style:italic;transform:translateX(14px)}
+#preview{position:fixed;left:0;top:0;width:230px;height:200px;z-index:40;pointer-events:none;opacity:0;border-radius:8px;overflow:hidden;
+  background:radial-gradient(circle at 50% 40%,#2a1c0e,#0a0705);border:1px solid var(--line);box-shadow:0 30px 60px rgba(0,0,0,.6)}
+#preview .art2{position:absolute;inset:0}
+
+/* weight-loss plans */
+#plans{background:radial-gradient(ellipse at 75% 40%,#1a1f0a 0%,#070605 62%)}
+.temp{font-family:var(--display);font-size:clamp(100px,19vw,300px);line-height:1;color:var(--gold);text-shadow:0 0 70px rgba(232,163,58,.4)}
+.temp sup{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);vertical-align:top;position:relative;top:1.6em;margin-left:10px;text-shadow:none}
+.wl{display:grid;grid-template-columns:repeat(3,1fr);gap:0 3vw;margin-top:9vh}
+.wl a{display:flex;gap:14px;padding:18px 0;border-top:1px solid var(--line);font-size:clamp(17px,1.5vw,22px);line-height:1.2;transition:color .3s,padding .3s}
+.wl a:hover{color:var(--gold2);padding-left:10px}
+.wl a span{font-family:var(--mono);font-size:10px;color:var(--gold);padding-top:4px}
+
+/* seasonal marquee */
+#seasonal{padding:14vh 0;overflow:hidden;border-top:1px solid var(--line)}
+#seasonal .eb{padding:0 4vw}
+.mq{white-space:nowrap;font-size:clamp(54px,9vw,150px);font-style:italic;line-height:1.1;will-change:transform}
+.mq span{display:inline-block;padding-right:.5em}
+.mq .o{-webkit-text-stroke:1px rgba(243,234,216,.4);color:transparent;font-style:normal;font-family:var(--display)}
+.mq a:hover{color:var(--gold)}
+.seas{display:grid;grid-template-columns:repeat(4,1fr);gap:2vw;padding:7vh 4vw 0}
+.seas a{border-top:1px solid var(--line);padding-top:14px;font-size:clamp(16px,1.4vw,21px);line-height:1.25;transition:color .3s}
+.seas a:hover{color:var(--gold2)}
+.seas a .mono{display:block;margin-bottom:8px}
+
+#close{min-height:120vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  background:radial-gradient(ellipse at 50% 55%,#2e1807 0%,#070605 62%)}
+#close .big{font-size:clamp(70px,15vw,250px);font-family:var(--display);font-weight:400;line-height:1}
+#close .w{display:inline-block;opacity:.08;background:linear-gradient(180deg,#fff4d6,#e0a64a 70%,#9b5c1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.quote{margin-top:5vh;font-style:italic;font-size:clamp(18px,1.8vw,26px);color:#b9ad98;max-width:36ch}
+.ea{margin-top:5vh;display:flex;gap:0;border:1px solid var(--gold);border-radius:999px;overflow:hidden;width:min(560px,90vw)}
+.ea input{flex:1;background:none;border:0;outline:0;padding:18px 26px;font-size:18px;color:var(--ink);min-width:0}
+.ea input::placeholder{color:rgba(243,234,216,.35)}
+.ea button{background:var(--gold);color:#120a02;border:0;padding:0 28px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;transition:background .3s}
+.ea button:hover{background:var(--gold2)}
+#eaMsg{margin-top:14px;min-height:20px;color:var(--gold2);font-style:italic;font-size:15px}
+footer{padding:5vh 4vw 2vh;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line)}
+footer .l{display:flex;gap:22px;flex-wrap:wrap}
+footer a:hover{color:var(--gold)}
+#credits{padding:0 4vw 5vh;line-height:2;text-transform:none;letter-spacing:.06em;font-size:10px}
+
+@media (max-width:900px){
+  body,a,button,input{cursor:auto} #cursor,#preview{display:none}
+  .info-wrap{left:6vw;top:15vh;width:62vw}.list,.prog{display:none}.eyebrow{top:10vh}
+  .art{top:55%;width:80vw;height:80vw}
+  .row{flex-direction:column;align-items:flex-start}.col-text{flex:none}
+  .hubs{grid-template-columns:1fr;width:100%}.card:nth-child(even){margin-top:0}
+  .glist{flex:none;width:100%}
+  .item{grid-template-columns:30px 1fr 80px}.item p,.item .tg{display:none}
+  .wl,.seas{grid-template-columns:1fr 1fr}
+  nav ul li:not(:last-child){display:none}.logo small{display:none}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="cursor"></div>
+
+<nav>
+  <a class="logo" href="#"><b>●</b> RotiAI <small>Pakistani recipes &amp; real calorie facts</small></a>
+  <ul>
+    <li><a href="#lookup">Calories</a></li><li><a href="#menu">Recipes</a></li><li><a href="#plans">Weight-Loss</a></li><li><a href="#seasonal">Seasonal</a></li>
+    <li><a class="btn" href="#close">Early access</a></li>
+  </ul>
+</nav>
+
+<!-- 01 · hero showcase (pinned, scroll-driven) -->
+<section id="stage">
+  <div class="eyebrow mono">ghar ki rasoi · Desi food, counted honestly.</div>
+  <div class="info-wrap" id="infos"></div>
+  <div class="art" id="art"></div>
+  <div class="words" id="words"></div>
+  <div class="list" id="list"><div class="mono">Popular right now</div></div>
+  <div class="hint mono">Scroll to serve the next dish</div>
+  <div class="prog mono" id="prog">01 / 08</div>
+</section>
+
+<!-- 02 · look up a dish -->
+<section class="s" id="lookup">
+  <div class="mono eb">02 — Calories</div>
+  <h2 class="big" data-split>Which dish do you want <em>counted?</em></h2>
+  <div class="search"><span class="mono">Search</span><input id="q" type="text" placeholder="try “masala dosa”, “bhindi”, “biryani”…" autocomplete="off"></div>
+  <div class="chips"><span class="mono">Popular</span>
+    <button class="chip" data-q="Masala Dosa">Masala Dosa with Sambar</button>
+    <button class="chip" data-q="Bhindi">Bhindi + Roti</button>
+    <button class="chip" data-q="Lauki">Lauki ki Sabzi + Roti</button>
+    <button class="chip" data-q="Vegetable Pulao">Vegetable Pulao</button>
+  </div>
+  <div id="results"></div>
+</section>
+
+<!-- 03 · hubs -->
+<section class="s" id="hubsec">
+  <div class="row">
+    <div class="col-text">
+      <div class="mono eb">03 — Explore the hubs</div>
+      <h2 class="big" data-split>Four hubs. One <em>honest</em> number.</h2>
+      <p>RotiAI is a food app. The guides on this site use the very same per-dish numbers as the app, so a count here matches the count in your pocket.</p>
+    </div>
+    <div class="hubs" id="hubs"></div>
+  </div>
+</section>
+
+<!-- 04 · free guides -->
+<section class="s" id="guides">
+  <div class="row">
+    <div class="col-text">
+      <div class="mono eb">04 — Free printable guides</div>
+      <h2 class="big" data-split>Nine free guides. <em>Print</em> them.</h2>
+      <p>Cheat sheets, planners and meal plans in PDF — made for the fridge door, not the screen.</p>
+    </div>
+    <div class="glist" id="glist"></div>
+  </div>
+</section>
+
+<!-- 05 · recipes -->
+<section class="s" id="menu">
+  <div class="head">
+    <div>
+      <div class="mono eb">05 — Recipes</div>
+      <h2 class="big" data-split>Cooked for the <em>whole</em> family.</h2>
+    </div>
+    <p>Tested desi recipes, each with its calories counted per serving. Hover to see the plate, click to open the recipe.</p>
+  </div>
+  <div id="menuList"></div>
+</section>
+<div id="preview"><div class="art2" id="previewArt"></div></div>
+
+<!-- 06 · weight loss -->
+<section class="s" id="plans">
+  <div class="row">
+    <div class="col-text">
+      <div class="mono eb">06 — Weight-loss</div>
+      <h2 class="big" data-split>Lose the weight. <em>Keep</em> the roti.</h2>
+    </div>
+    <div class="temp"><span id="temp">0</span><sup>plans</sup></div>
+  </div>
+  <div class="wl" id="wl"></div>
+</section>
+
+<!-- 07 · seasonal -->
+<section class="s" id="seasonal">
+  <div class="mono eb">07 — Seasonal</div>
+  <div class="mq" id="mq1"></div>
+  <div class="mq" id="mq2" style="margin-top:1vh"></div>
+  <div class="seas" id="seas"></div>
+</section>
+
+<!-- 08 · early access -->
+<section class="s" id="close">
+  <div class="mono" style="margin-bottom:5vh">08 — Early access</div>
+  <h2 class="big" id="rasoi"><span class="w">Ghar ki</span><br><span class="w">rasoi.</span></h2>
+  <p class="quote">ghar ki rasoi, ab search par bhi. Your best health-curated app, coming to your door.</p>
+  <form class="ea" id="ea"><input type="email" id="eaMail" placeholder="your@email.com" required><button type="submit">Apply for early access</button></form>
+  <div id="eaMsg"></div>
+</section>
+<footer>
+  <span class="mono">RotiAI · desi recipes and real calorie facts</span>
+  <span class="l mono"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Delete your account</a></span>
+</footer>
+<div class="credits mono" id="credits">Dish data, guide titles and photos: rotiai.app</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const $ = (s, r = document) => r.querySelector(s);
+const rand = (a, b) => a + Math.random() * (b - a);
+const pad = n => String(n).padStart(2, '0');
+const SITE = 'https://rotiai.app';
+// Early-access form: set this to your backend URL (it receives {email} as JSON). Left empty, the form tells the visitor it is not connected.
+const FORM_ENDPOINT = '';
+
+/* ---------- data (from rotiai.app) ---------- */
+const DISHES = [
+  {word:'Aloo Anda', name:'Aloo', sub:'Anda', img:'images/aloo_anda.jpg', tag:'Recipe · 25 min · serves 4', kcal:360, path:'/recipes/aloo-anda-recipe/',
+   desc:'Eggs and potatoes simmered in a tomato-onion masala. One pan, twenty-five minutes.', pal:['#f2b84b','#d9772b','#7a3b12','#fff1cc'], shape:'chunk'},
+  {word:'Bhurji', name:'Anda Bhurji', sub:'+ Roti', img:'images/anda_bhurji.jpg', tag:'Recipe · 15 min · serves 4', kcal:320, path:'/recipes/anda-bhurji-roti-recipe/',
+   desc:'Soft-scrambled egg bhurji with onion, tomato and green chilli, served with hot roti.', pal:['#f4d35e','#e08a2b','#6a8f3a','#fff4d6'], shape:'herb'},
+  {word:'Dosa', name:'Masala Dosa', sub:'with Sambar', img:'images/masala_dosa_sambar.jpg', tag:'Recipe · 55 min · serves 4', kcal:340, note:'about 470 with sambar', path:'/calories/calories-in-masala-dosa-sambar/',
+   desc:'A crisp rice-and-lentil dosa filled with spiced potato, with sambar and chutney on the side.', pal:['#e9b870','#b9772a','#6a8f3a','#fff1cc'], shape:'herb'},
+  {word:'Pulao', name:'Kabuli', sub:'Pulao', img:'images/kabuli_pulao.jpg', tag:'Recipe · 90 min · serves 4', kcal:610, path:'/recipes/kabuli-pulao-recipe/',
+   desc:'Slow-cooked rice with tender meat, carrot and raisins. The heaviest plate here, counted honestly.', pal:['#e8a33a','#f0d9a0','#8a5a1a','#fff0c8'], shape:'rice'},
+  {word:'Chapli', name:'Chapli', sub:'Kebab', img:'images/chapli_kebab.jpg', tag:'Recipe · 40 min · serves 4', kcal:430, note:'for two kebabs', path:'/recipes/chapli-kebab-recipe/',
+   desc:'Spiced, shallow-fried mince patties with tomato and onion. The number covers two kebabs.', pal:['#a53a24','#6b3418','#7fa34a','#f0d9b0'], shape:'herb'},
+  {word:'Bhindi', name:'Bhindi', sub:'+ Roti', img:'images/bhindi.jpg', tag:'Recipe · 30 min · serves 4', kcal:310, note:'bhindi plus 2 roti', path:'/recipes/bhindi-roti-recipe/',
+   desc:'Pakistani-style okra with two rotis. A light everyday plate that still feels like home.', pal:['#7fa34a','#c8d48a','#e8a33a','#fff1cc'], shape:'herb'},
+  {word:'Daal', name:'Daal', sub:'Chawal', img:'images/daal_chawal.jpg', tag:'Recipe · 30 min · serves 4', kcal:380, path:'/recipes/daal-chawal-recipe/',
+   desc:'Yellow daal over steamed white rice. The comfort plate, with the numbers written on it.', pal:['#f2c14e','#e8a33a','#f3ead8','#7fa34a'], shape:'rice'},
+  {word:'Chaat', name:'Chana', sub:'Chaat', img:'images/chana_chaat.jpg', tag:'Recipe · 15 min · serves 4', kcal:260, path:'/recipes/chana-chaat-recipe/',
+   desc:'Chickpeas, tomato, onion and yoghurt with a squeeze of lemon. Fifteen minutes, no stove drama.', pal:['#f0d9a0','#c43a2a','#7fa34a','#ffffff'], shape:'chunk'}
+];
+
+const HUBS = [
+  {n:51, t:'Calories', p:'Real kcal per serving, dish by dish.', path:'/calories/', img:'images/idli_sambar.jpg'},
+  {n:49, t:'Recipes', p:'Desi dishes, step by step.', path:'/recipes/', img:'images/keema_karahi.jpg'},
+  {n:9, t:'Weight-Loss', p:'Plans that keep roti on the plate.', path:'/weight-loss/', img:'images/grilled_chicken.jpg'},
+  {n:4, t:'Seasonal', p:'Ramzan, Eid, mango season and sardi.', path:'/seasonal/', img:'images/palak_gosht.jpg'}
+];
+
+const GUIDES = [
+  ['The Balanced Desi Plate', 12, '/free-guides/balanced-plate-guide/'], ['Desi Calorie Cheat Sheet', 8, '/free-guides/desi-calorie-cheat-sheet/'],
+  ['The 7-Day Desi Meal Plan', 18, '/free-guides/desi-meal-plan-7day/'], ['Desi Smoothies, Lassi & Shakes', 21], ['Weekly Desi Grocery & Meal Planner', 14],
+  ['High-Protein Desi Recipes', 33], ['School Tiffin Planner', 19], ['Ramzan Sehri & Iftar Planner', 24], ['Sardi Soups, Halwas & Warm Drinks', 19]
+];
+const GCOL = ['#e8a33a','#8fb35a','#d9772b','#f2d27a','#c43a2a','#7fa34a','#f0b25a','#b66a32','#e08a5a'];
+
+const RECIPES = [
+  ['Aloo Anda', '25 min', 360, 'aloo-anda-recipe', 'aloo_anda'], ['Anda Bhurji + Roti', '15 min', 320, 'anda-bhurji-roti-recipe', 'anda_bhurji'],
+  ['Besan Cheela + Dahi', '20 min', 290, 'besan-cheela-dahi-recipe', 'besan_cheela'], ['Bhindi + Roti', '30 min', 310, 'bhindi-roti-recipe', 'bhindi'],
+  ['Chana Chaat', '15 min', 260, 'chana-chaat-recipe', 'chana_chaat'], ['Daal Chawal', '30 min', 380, 'daal-chawal-recipe', 'daal_chawal'],
+  ['Idli Sambar', '40 min', 330, 'idli-sambar-recipe', 'idli_sambar'], ['Kabuli Pulao', '90 min', 610, 'kabuli-pulao-recipe', 'kabuli_pulao'],
+  ['Chapli Kebab', '40 min', 430, 'chapli-kebab-recipe', 'chapli_kebab'], ['Keema Karahi', '40 min', 460, 'keema-karahi-recipe', 'keema_karahi'],
+  ['Palak Gosht', '45 min', 420, 'palak-gosht-recipe', 'palak_gosht'], ['Grilled Chicken Salad', '25 min', 340, 'grilled-chicken-salad-recipe', 'grilled_chicken']
+];
+
+const WL = [
+  ['7-Day Pakistani Diet Plan for Weight Loss', '7-day-pakistani-diet-plan-for-weight-loss'], ['Desi Weight-Loss Meals (Full Day Ideas)', 'desi-weight-loss-meals'],
+  ['Pakistani Diet Plan for Weight Loss for Females', 'pakistani-diet-plan-for-weight-loss-females'], ['Low-Cal Desi Food Swaps That Actually Work', 'low-cal-desi-swaps'],
+  ['Roti vs Rice for Weight Loss: Which Is Better?', 'roti-vs-rice-for-weight-loss'], ['Can You Eat Chinese Food on a Weight-Loss Diet?', 'chinese-food-on-weight-loss-diet'],
+  ['Healthy Chinese Food: The Lightest Desi Picks', 'healthy-chinese-food'], ['Gluten-Free Chinese Food: Safe, Swap or Skip', 'gluten-free-chinese-food-desi'],
+  ['Vegan Chinese Food: Desi-Chinese Dishes That Qualify', 'vegan-vegetarian-chinese']
+];
+
+const SEASONAL = [
+  ['Ramzan', 'Easy Iftar Recipes for Ramadan', 'easy-iftar-recipes-ramadan'], ['Eid', 'Eid Special Recipes: Sheer Khurma & Mutton Pulao', 'eid-special-recipes'],
+  ['Mango season', 'Mango Season Desi Recipes: Aam Ras & Lassi', 'mango-season-desi-recipes'], ['Sardi', 'Sardi Food: Winter Desi Comfort Recipes with Calories', 'winter-sardi-desi-recipes']
+];
+
+// name | kcal | slug  (the 51 calorie guides)
+const CAL = `Beef and Broccoli|~340 kcal|calories-in-beef-and-broccoli
+Aloo Anda|~360 kcal|calories-in-aloo-anda
+Anda Bhurji + Roti|~320 kcal|calories-in-anda-bhurji-roti
+Bengali Shorshe Mach|~390 kcal|calories-in-bengali-shorshe-mach
+Besan Cheela + Dahi|~290 kcal|calories-in-besan-cheela-dahi
+Bhindi + Roti|~310 kcal (bhindi + 2 roti)|calories-in-bhindi-roti
+Bhuna Khichuri|~410 kcal|calories-in-bhuna-khichuri
+Chana Chaat|~260 kcal|calories-in-chana-chaat
+Chapli Kebab|~430 kcal for 2 kebabs|calories-in-chapli-kebab
+Chapati: size, macros & roti||calories-in-chapati
+Chicken Chopsuey|~329 kcal|calories-in-chicken-chopsuey
+Char Siu|~384 kcal|calories-in-char-siu
+Chicken Dumplings|~220 kcal for 6 pieces|calories-in-chicken-dumplings
+Chicken Fried Rice|~430 kcal|calories-in-chicken-fried-rice
+Chicken Hot Pot|~310 kcal|calories-in-chicken-hot-pot
+Chicken Lolypop|~433 kcal for 4 pieces|calories-in-chicken-lolypop
+Chicken Steam BBQ|~251 kcal|calories-in-chicken-steam-bbq
+Chicken Yakhni Soup|~220 kcal|calories-in-chicken-yakhni-soup
+Chilli Chicken|~400 kcal|calories-in-chilli-chicken
+Chicken Manchurian|~360 kcal|calories-in-chicken-manchurian
+Chinese Beef Curry|~410 kcal|calories-in-chinese-beef-curry
+Chow Mein|~420 kcal|calories-in-chow-mein
+Daal Chawal|~380 kcal|calories-in-daal-chawal
+Fish Curry + Rice|~400 kcal|calories-in-fish-curry-rice
+Grilled Chicken + Salad|~340 kcal|calories-in-grilled-chicken-salad
+Idli Sambar|~330 kcal|calories-in-idli-sambar
+Hot and Sour Soup|~93 kcal|calories-in-hot-and-sour-soup
+Kabuli Pulao|~610 kcal|calories-in-kabuli-pulao
+Keema Karahi|~460 kcal|calories-in-keema-karahi
+Lauki Sabzi + Roti|~300 kcal for 2 rotis|calories-in-lauki-ki-sabzi-roti
+Masala Dosa|~340 kcal (~470 with sambar)|calories-in-masala-dosa-sambar
+Masoor Daal + Brown Rice|~360 kcal|calories-in-masoor-daal-brown-rice
+Moong Daal Khichdi|~330 kcal|calories-in-moong-daal-khichdi
+Pashtun Namkeen Gosht|~560 kcal|calories-in-pashtun-namkeen-gosht
+Palak Gosht|~420 kcal|calories-in-palak-gosht
+Pepper Rasam Rice|~350 kcal|calories-in-pepper-rasam-rice
+Salt and Pepper Prawns|~260 kcal|calories-in-salt-and-pepper-prawns
+Schezwan Chicken|~326 kcal|calories-in-schezwan-chicken
+Plain Dosa|~168 kcal per medium dosa|calories-in-plain-dosa
+Sindhi Koki|~340 kcal per koki|calories-in-sindhi-koki
+Sindhi Sai Bhaji|~290 kcal|calories-in-sindhi-sai-bhaji
+Spring Rolls|~185 kcal for 2 rolls|calories-in-spring-rolls
+Sweet and Sour Chicken|~390 kcal|calories-in-sweet-and-sour-chicken
+Veg Manchurian|~330 kcal|calories-in-veg-manchurian
+Vegetable Pulao|~420 kcal per cup|calories-in-vegetable-pulao
+Hakka Noodles|~420 kcal|calories-in-veg-hakka-noodles
+Chinese Food Calories (Pakistani-Chinese)||chinese-food-calories
+Tandoori Chicken + Raita|~380 kcal|calories-in-tandoori-chicken-raita
+1 Idli|~49 kcal (2 idlis = 97)|how-many-calories-in-1-idli
+How many calories in 1 roti?||how-many-calories-in-1-roti
+Roti nutrition facts: macros & fiber||roti-nutrition-facts`.split('\n').map(l => l.split('|'));
+
+/* ---------- dish art (photo plate + floating bits) ---------- */
+function makeDish(el, d, n = 58){
+  el.innerHTML = '<div class="bowl"></div><div class="mound"></div>';
+  const mound = $('.mound', el);
+  mound.style.background = `radial-gradient(circle at 38% 32%, ${d.pal[3]}, ${d.pal[0]} 22%, ${d.pal[1]} 60%, ${d.pal[2]} 100%)`;
+  const parts = [];
+  const W = el.clientWidth, H = el.clientHeight, S = Math.min(W, H);
+  if(d.img){
+    const D = S * .76; n = Math.min(n, 30);
+    $('.bowl', el).style.display = 'none';
+    Object.assign(mound.style, {left: (W - D) / 2 + 'px', top: (H - D) / 2 - S * .02 + 'px', right: 'auto', bottom: 'auto', width: D + 'px', height: D + 'px',
+      borderRadius: '50%', background: `url(${d.img}) center/cover`,
+      boxShadow: '0 0 0 3px rgba(232,163,58,.55), 0 30px 90px rgba(0,0,0,.75), 0 0 130px rgba(232,163,58,.28)'});
+  }
+  for(let i = 0; i < n; i++){
+    const p = document.createElement('div'), s = document.createElement('i');
+    p.className = 'p';
+    const a = rand(0, Math.PI * 2), r = Math.sqrt(Math.random());
+    const R = rand(.42, .56);
+    const cx = d.img ? (W / 2 + Math.cos(a) * R * S) / W * 100 : 50 + Math.cos(a) * r * 44;
+    const cy = d.img ? (H / 2 - S * .02 + Math.sin(a) * R * S) / H * 100 : 46 + Math.sin(a) * r * 40;
+    const w = d.shape === 'rice' ? rand(16, 30) : d.shape === 'herb' ? rand(10, 24) : rand(14, 28);
+    const h = d.shape === 'rice' ? w * .28 : d.shape === 'herb' ? w * .5 : w * rand(.7, 1);
+    p.style.cssText = `left:${cx}%;top:${cy}%;width:${w}px;height:${h}px;`;
+    s.style.background = d.pal[(i % 4)];
+    s.style.setProperty('--d', rand(3, 6) + 's'); s.style.setProperty('--dl', -rand(0, 5) + 's');
+    if(d.shape === 'herb' && i % 3 === 0) s.style.borderRadius = '2px 60% 2px 60%';
+    p.appendChild(s); el.appendChild(p);
+    gsap.set(p, {rotation: rand(-180, 180)});
+    parts.push(p);
+  }
+  return {parts, mound};
+}
+
+/* ---------- build stage ---------- */
+const infos = $('#infos'), art = $('#art'), words = $('#words'), list = $('#list');
+const stage = DISHES.map((d, i) => {
+  const info = document.createElement('div'); info.className = 'info';
+  info.innerHTML = `<div class="num">${pad(i + 1)}<small>/ ${pad(DISHES.length)}</small></div>
+    <div class="mono tag">${d.tag}</div><h2>${d.name}<em>${d.sub}</em></h2><p>${d.desc}</p>
+    <div class="price"><b>${d.kcal}</b><i>KCAL</i><small>per serving${d.note ? ' · ' + d.note : ''}</small><a href="${SITE + d.path}" target="_blank" rel="noopener">Open the recipe ↗</a></div>`;
+  infos.appendChild(info);
+  const dish = document.createElement('div'); dish.className = 'dish'; art.appendChild(dish);
+  const parts = makeDish(dish, d);
+  const w = document.createElement('div'); w.className = 'word'; w.textContent = d.word; words.appendChild(w);
+  const a = document.createElement('a'); a.href = SITE + d.path; a.target = '_blank'; a.rel = 'noopener';
+  a.innerHTML = `${d.name} ${d.sub}<span>${d.kcal}</span>`;
+  list.appendChild(a);
+  gsap.set(dish, {autoAlpha: 0}); gsap.set(w, {yPercent: 140});
+  return {info, dish, w, a, ...parts};
+});
+
+let cur = -1;
+const everything = s => [s.info, s.w, s.mound, s.dish, ...s.parts];
+function hideItem(s, dir, animate){
+  gsap.killTweensOf(everything(s));
+  s.a.classList.remove('on');
+  if(!animate){
+    gsap.set(s.info, {autoAlpha: 0}); gsap.set(s.w, {yPercent: 140}); gsap.set(s.dish, {autoAlpha: 0});
+    return;
+  }
+  gsap.to(s.info, {autoAlpha: 0, y: -24 * dir, duration: .3, ease: 'power2.in'});
+  gsap.to(s.w, {yPercent: -140 * dir, duration: .45, ease: 'power3.in'});
+  gsap.to(s.parts, {x: () => rand(-380, 380), y: () => rand(-420, 120), rotation: '+=140', opacity: 0, duration: .5, ease: 'power2.in', stagger: {each: .006, from: 'random'}});
+  gsap.to(s.mound, {scale: .6, opacity: 0, duration: .45});
+  gsap.to(s.dish, {autoAlpha: 0, duration: .01, delay: .6});
+}
+function show(i){
+  if(i === cur) return;
+  const next = stage[i], dir = i > cur ? 1 : -1;
+  // only the dish we are leaving animates out; every other one is hidden at once, so fast scrolling never stacks them
+  stage.forEach((s, j) => { if(j !== i) hideItem(s, dir, j === cur); });
+  gsap.killTweensOf(everything(next));
+  gsap.set(next.dish, {autoAlpha: 1});
+  gsap.fromTo(next.info, {autoAlpha: 0, y: 30 * dir}, {autoAlpha: 1, y: 0, duration: .8, delay: .35, ease: 'power3.out'});
+  gsap.fromTo(next.w, {yPercent: 140 * dir}, {yPercent: 0, duration: 1, delay: .35, ease: 'power4.out'});
+  gsap.fromTo(next.mound, {scale: .55, opacity: 0, rotation: -20}, {scale: 1, opacity: 1, rotation: 0, duration: 1.1, delay: .3, ease: 'back.out(1.4)'});
+  gsap.fromTo(next.parts, {x: () => rand(-380, 380), y: () => rand(-380, 160), opacity: 0, scale: .4},
+    {x: 0, y: 0, opacity: 1, scale: 1, duration: 1.3, delay: .3, ease: 'power3.out', stagger: {each: .012, from: 'random'}});
+  next.a.classList.add('on');
+  $('#prog').textContent = `${pad(i + 1)} / ${pad(DISHES.length)}`;
+  cur = i;
+}
+show(0);
+
+ScrollTrigger.create({
+  trigger: '#stage', start: 'top top', end: () => '+=' + innerHeight * (DISHES.length - 1) * .9, pin: true,
+  onUpdate: s => show(Math.min(DISHES.length - 1, Math.round(s.progress * (DISHES.length - 1))))
+});
+addEventListener('pointermove', e => {
+  const x = (e.clientX / innerWidth - .5), y = (e.clientY / innerHeight - .5);
+  gsap.to('#art', {x: x * 26, y: y * 18, duration: .9, ease: 'power2.out'});
+});
+
+/* ---------- headline split + reveal ---------- */
+document.querySelectorAll('[data-split]').forEach(h => {
+  const out = [];
+  h.childNodes.forEach(n => {
+    const isEm = n.nodeType === 1, text = n.textContent;
+    text.split(/(\s+)/).forEach(t => {
+      if(!t.trim()) { out.push(' '); return; }
+      out.push(`<span style="display:inline-block;overflow:hidden;vertical-align:top"><span class="sw" style="display:inline-block">${isEm ? '<em>' + t + '</em>' : t}</span></span>`);
+    });
+  });
+  h.innerHTML = out.join('');
+  gsap.from(h.querySelectorAll('.sw'), {yPercent: 115, rotation: 4, duration: 1.1, ease: 'power4.out', stagger: .07,
+    scrollTrigger: {trigger: h, start: 'top 82%'}});
+});
+
+/* ---------- calorie search ---------- */
+const res = $('#results'), q = $('#q');
+const POPULAR = ['Masala Dosa', 'Bhindi + Roti', 'Lauki Sabzi + Roti', 'Vegetable Pulao'];
+function renderResults(){
+  const t = q.value.trim().toLowerCase();
+  const rows = t ? CAL.filter(r => r[0].toLowerCase().includes(t)).slice(0, 8) : CAL.filter(r => POPULAR.includes(r[0]));
+  res.innerHTML = rows.length ? rows.map(r => `<a class="res" href="${SITE}/calories/${r[2]}/" target="_blank" rel="noopener"><div>${r[0]}</div><span>${r[1] || 'Open guide'} ↗</span></a>`).join('')
+    : `<div class="none">No guide for “${q.value.replace(/</g, '&lt;')}” yet — try another dish.</div>`;
+}
+q.addEventListener('input', renderResults);
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { q.value = c.dataset.q; renderResults(); }));
+renderResults();
+
+/* ---------- hubs ---------- */
+const hubs = $('#hubs');
+HUBS.forEach(h => {
+  const a = document.createElement('a'); a.className = 'card'; a.href = SITE + h.path; a.target = '_blank'; a.rel = 'noopener';
+  a.style.backgroundImage = `url(${h.img})`;
+  a.innerHTML = `<div class="in"><div class="cn" data-n="${h.n}">0</div><h3>${h.t}</h3><p>${h.p}</p></div>`;
+  hubs.appendChild(a);
+});
+document.querySelectorAll('.cn').forEach(el => {
+  const o = {v: 0};
+  gsap.to(o, {v: +el.dataset.n, duration: 1.6, ease: 'power2.out', scrollTrigger: {trigger: el, start: 'top 90%'}, onUpdate: () => el.textContent = Math.round(o.v)});
+});
+gsap.from('.card', {y: 60, opacity: 0, duration: 1, ease: 'power3.out', stagger: .12, scrollTrigger: {trigger: '#hubs', start: 'top 80%'}});
+
+/* ---------- guides ---------- */
+const gl = $('#glist');
+GUIDES.forEach(([n, pg, path], i) => {
+  const d = document.createElement(path ? 'a' : 'div'); d.className = 'g';
+  if(path){ d.href = SITE + path; d.target = '_blank'; d.rel = 'noopener'; }
+  d.innerHTML = `<span class="dot" style="background:${GCOL[i]};color:${GCOL[i]}"></span>${n}<span class="mono">${pg} pages</span>`;
+  gl.appendChild(d);
+});
+gsap.from('.g', {x: 60, opacity: 0, duration: .9, ease: 'power3.out', stagger: .08, scrollTrigger: {trigger: '#glist', start: 'top 80%'}});
+
+/* ---------- recipes ---------- */
+const ml = $('#menuList'), pv = $('#preview'), pvArt = $('#previewArt');
+RECIPES.forEach(([name, time, kcal, slug, img], i) => {
+  const d = {img: `images/${img}.jpg`, pal: ['#f2b84b', '#d9772b', '#7a3b12', '#fff1cc'], shape: 'chunk'};
+  const it = document.createElement('a'); it.className = 'item'; it.href = `${SITE}/recipes/${slug}/`; it.target = '_blank'; it.rel = 'noopener';
+  it.innerHTML = `<span class="mono">${pad(i + 1)}</span><h3>${name}</h3><p>${time} · serves 4 · full recipe with calories per serving</p><span class="mono tg">Recipe</span><span class="pr">${kcal} <small>KCAL</small></span>`;
+  it.addEventListener('mouseenter', () => { makeDish(pvArt, d, 22); gsap.to(pv, {opacity: 1, scale: 1, duration: .35}); });
+  it.addEventListener('mouseleave', () => gsap.to(pv, {opacity: 0, scale: .9, duration: .25}));
+  ml.appendChild(it);
+});
+gsap.from('.item', {y: 40, opacity: 0, duration: .8, ease: 'power3.out', stagger: .06, scrollTrigger: {trigger: '#menuList', start: 'top 82%'}});
+const pxTo = gsap.quickTo(pv, 'x', {duration: .4, ease: 'power3'}), pyTo = gsap.quickTo(pv, 'y', {duration: .4, ease: 'power3'});
+
+/* ---------- weight-loss plans ---------- */
+const wl = $('#wl');
+WL.forEach(([t, slug], i) => {
+  const a = document.createElement('a'); a.href = `${SITE}/weight-loss/${slug}/`; a.target = '_blank'; a.rel = 'noopener';
+  a.innerHTML = `<span>${pad(i + 1)}</span>${t}`; wl.appendChild(a);
+});
+const tmp = {v: 0};
+gsap.to(tmp, {v: WL.length, duration: 1.6, ease: 'power2.out', scrollTrigger: {trigger: '#plans', start: 'top 60%'}, onUpdate: () => $('#temp').textContent = Math.round(tmp.v)});
+gsap.from('#wl a', {y: 30, opacity: 0, duration: .8, ease: 'power3.out', stagger: .07, scrollTrigger: {trigger: '#wl', start: 'top 85%'}});
+
+/* ---------- seasonal marquee ---------- */
+const mqHTML = (arr, outline) => arr.map((t, i) => `<span class="${outline && i % 2 ? 'o' : ''}">${t}</span><span class="o">·</span>`).join('').repeat(3);
+$('#mq1').innerHTML = mqHTML(['Iftar', 'Eid', 'Aam ras', 'Sardi'], true);
+$('#mq2').innerHTML = mqHTML(['Sheer khurma', 'Mutton pulao', 'Mango lassi', 'Winter halwa'], true);
+gsap.fromTo('#mq1', {x: '0%'}, {x: '-33%', ease: 'none', scrollTrigger: {trigger: '#seasonal', start: 'top bottom', end: 'bottom top', scrub: .6}});
+gsap.fromTo('#mq2', {x: '-33%'}, {x: '0%', ease: 'none', scrollTrigger: {trigger: '#seasonal', start: 'top bottom', end: 'bottom top', scrub: .6}});
+$('#seas').innerHTML = SEASONAL.map(([k, t, slug]) => `<a href="${SITE}/seasonal/${slug}/" target="_blank" rel="noopener"><span class="mono">${k}</span>${t}</a>`).join('');
+gsap.from('.seas a', {y: 30, opacity: 0, duration: .8, stagger: .1, ease: 'power3.out', scrollTrigger: {trigger: '#seas', start: 'top 90%'}});
+
+/* ---------- early access ---------- */
+gsap.to('#rasoi .w', {opacity: 1, stagger: .5, ease: 'none', scrollTrigger: {trigger: '#close', start: 'top 55%', end: 'center 45%', scrub: true}});
+gsap.from('.quote,.ea', {y: 40, opacity: 0, duration: 1, stagger: .2, scrollTrigger: {trigger: '.quote', start: 'top 90%'}});
+$('#ea').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('#eaMsg'), email = $('#eaMail').value.trim();
+  if(!FORM_ENDPOINT){ msg.textContent = 'The early-access form is not connected to a backend yet.'; return; }
+  try{
+    const r = await fetch(FORM_ENDPOINT, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email})});
+    if(!r.ok) throw new Error(r.status);
+    msg.textContent = 'Thank you — we will email you when the app opens.'; $('#ea').reset();
+  }catch(err){ msg.textContent = 'Something went wrong. Please try again.'; }
+});
+
+/* ---------- cursor + anchors ---------- */
+const cur_ = $('#cursor');
+const cxTo = gsap.quickTo(cur_, 'x', {duration: .18, ease: 'power3'}), cyTo = gsap.quickTo(cur_, 'y', {duration: .18, ease: 'power3'});
+addEventListener('pointermove', e => { cxTo(e.clientX); cyTo(e.clientY); pxTo(e.clientX + 24); pyTo(e.clientY - 100); });
+document.addEventListener('mouseover', e => cur_.classList.toggle('big', !!e.target.closest('a,.chip,button')));
+document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+  const t = a.getAttribute('href'); e.preventDefault();
+  if(t.length > 1) document.querySelector(t)?.scrollIntoView({behavior: 'smooth'});
+}));
+</script>
+</body>
+</html>
